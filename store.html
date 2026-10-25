@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>X7 Team Store</title>
+<style>
+body{margin:0;background:#000;color:#fff;font-family:sans-serif}
+.box{width:92%;max-width:360px;margin:70px auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:18px;padding:22px;text-align:center}
+input{width:100%;padding:13px;margin:6px 0;background:#000;border:1px solid #222;color:#fff;border-radius:10px;text-align:center}
+.btn{width:100%;padding:13px;background:#fff;color:#000;border:none;border-radius:10px;font-weight:900;cursor:pointer;margin-top:8px}
+.big{max-width:500px;margin:15px auto;background:#050505;border:1px solid #111;border-radius:18px;padding:18px}
+.product{background:#000;border:1px solid #1e1e1e;border-radius:14px;padding:18px;display:flex;justify-content:space-between;align-items:center}
+.codeSingle{background:#0a0a0a;border:1px dashed #fff;border-radius:12px;padding:12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.qtyBox{display:flex;align-items:center;gap:10px;background:#000;border:1px solid #222;border-radius:10px;padding:8px 14px;width:fit-content;margin:14px 0}
+.qtyBtn{width:34px;height:34px;background:#fff;color:#000;border:none;border-radius:8px;font-weight:900;font-size:18px;cursor:pointer}
+.hidden{display:none}
+.top{max-width:520px;margin:auto;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;background:#050505;border-bottom:1px solid #111;position:relative}
+.dots{width:38px;height:38px;background:#111;border:1px solid #222;border-radius:10px;display:flex;justify-content:center;align-items:center;cursor:pointer}
+.menu{position:absolute;top:55px;right:14px;width:310px;background:#0e0e0e;border:1px solid #222;border-radius:16px;padding:14px;z-index:99;max-height:85vh;overflow:auto}
+</style>
+</head>
+<body>
+
+<div id="login" class="box">
+<h2>X7 TEAM</h2>
+<p style="color:#555;font-size:11px">Login by Name Only</p>
+<input id="u" placeholder="Username فقط">
+<div style="display:flex;align-items:center;gap:8px;margin:10px 0">
+<input id="save" type="checkbox" style="width:18px;height:18px;margin:0">
+<label for="save" style="font-size:13px;color:#aaa">Remember me</label>
+</div>
+<button class="btn" onclick="login()">LOGIN</button>
+</div>
+
+<div id="store" class="hidden">
+<div class="top">
+<div style="font-weight:900">X7 TEAM - <span id="roleLabel" style="font-size:11px;color:#888"></span></div>
+<div style="display:flex;gap:8px"><button onclick="logout()" style="background:#200;color:#f66;border:1px solid #411;padding:6px 12px;border-radius:8px;cursor:pointer">Logout</button><div id="ownerDots" class="dots hidden" onclick="toggleMenu()">⋮</div></div>
+<div id="menu" class="menu hidden">
+<h3>👑 Owner Panel</h3>
+<input id="nu" placeholder="New Username - اسم فقط"><input id="nb" type="number" placeholder="Balance">
+<button class="btn" onclick="make()">Create Account</button>
+<div style="border-top:1px solid #222;margin-top:12px;padding-top:12px">
+<h4>App License Keys</h4>
+<input id="adminPass" type="password" placeholder="Server admin password">
+<input id="keyCount" type="number" min="1" max="50" value="1" placeholder="Quantity">
+<input id="keyDays" type="number" min="1" value="30" placeholder="Validity in days">
+<button class="btn" onclick="makeRealKeys()">Generate Real App Keys</button>
+<div id="realKeys"></div>
+<p style="font-size:11px;color:#888">Creates keys in the X7 Team app server database. Requires the server to be running.</p>
+</div>
+<div id="list"></div>
+</div>
+</div>
+
+<div style="max-width:520px;margin:auto;padding:12px">
+<div style="background:#0a0a0a;padding:12px;border-radius:12px;display:flex;justify-content:space-between"><span id="who"></span><span id="bal" style="color:#0f0;font-weight:900">$0.00</span></div>
+<div class="big">
+<div class="product"><div><b style="font-size:22px">X7 Panel</b><div style="color:#777">1 Hour</div></div><div style="font-size:28px;font-weight:900">$0.80</div></div>
+<div class="qtyBox"><button class="qtyBtn" onclick="chg(-1)">-</button><span id="q" style="font-weight:900;min-width:24px;text-align:center">1</span><button class="qtyBtn" onclick="chg(1)">+</button><span id="tot" style="color:#888;font-size:12px;margin-left:8px">Total $0.80</span></div>
+<button class="btn" onclick="buy()">Buy Codes</button>
+<div id="codesArea"></div>
+</div>
+</div>
+</div>
+
+<script>
+// المالك الجديد X7
+let users=[{u:'Adham012012012',b:9999,r:'owner'}];
+let saved=JSON.parse(localStorage.getItem('x7_store')||'null');
+if(saved) users=saved;
+users=users.filter(x=>x.u==='Adham012012012' || x.r!=='owner');
+if(!users.find(x=>x.u==='Adham012012012')) users.unshift({u:'Adham012012012',b:9999,r:'owner'});
+localStorage.setItem('x7_store',JSON.stringify(users));
+
+let me=null, qty=1;
+window.onload=()=>{
+ let acc=JSON.parse(localStorage.getItem('x7_saved')||'null');
+ if(acc){u.value=acc.u; save.checked=true;}
+}
+function login(){
+ let uu=u.value.trim();
+ let f=users.find(x=>x.u===uu);
+ if(!f){alert('الاسم غير موجود');return;}
+ me=f;
+ if(save.checked){localStorage.setItem('x7_saved',JSON.stringify({u:uu}))}else{localStorage.removeItem('x7_saved')}
+ document.getElementById('login').classList.add('hidden');
+ document.getElementById('store').classList.remove('hidden');
+ who.innerText=me.u; roleLabel.innerText=me.r; upd(); renderU();
+ if(me.u==='Adham012012012' && me.r==='owner'){ownerDots.classList.remove('hidden')}else{ownerDots.classList.add('hidden');menu.classList.add('hidden')}
+}
+function logout(){store.classList.add('hidden');login.classList.remove('hidden');menu.classList.add('hidden');}
+function upd(){bal.innerText='$'+users.find(x=>x.u===me.u).b.toFixed(2);}
+function chg(d){qty+=d;if(qty<1)qty=1;if(qty>20)qty=20;q.innerText=qty;tot.innerText='Total $'+(qty*0.8).toFixed(2);}
+function toggleMenu(){if(me.u!=='Adham012012012'){alert('فقط للمالك');return;}menu.classList.toggle('hidden');}
+function make(){
+ if(me.u!=='Adham012012012'){alert('فقط للمالك');return;}
+ let uu=nu.value.trim(), bb=parseFloat(nb.value)||0;
+ if(!uu){alert('اكتب الاسم');return;}
+ users.push({u:uu,b:bb,r:'user'});
+ localStorage.setItem('x7_store',JSON.stringify(users)); renderU(); nu.value='';nb.value='';
+}
+function renderU(){
+ if(me.u!=='Adham012012012') return;
+ list.innerHTML=users.map((x,i)=>`<div class="codeSingle" style="flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;width:100%"><b>${x.u} ${x.r==='owner'?'👑':''}</b><span>$${x.b.toFixed(2)}</span></div><div style="display:flex;gap:5px;width:100%"><input id="a_${i}" type="number" placeholder="add balance" style="margin:0;padding:6px"><button onclick="addBal(${i})" style="background:#fff;color:#000;border:none;padding:6px 10px;border-radius:6px;font-weight:800">Add</button>${x.r==='owner'?'<small>Protected</small>':`<button onclick="delUser(${i})" style="background:#300;color:#f66;border:none;padding:6px 10px;border-radius:6px">Del</button>`}</div></div>`).join('');
+}
+function addBal(i){if(me.u!=='Adham012012012')return; let v=parseFloat(document.getElementById('a_'+i).value)||0; users[i].b+=v; localStorage.setItem('x7_store',JSON.stringify(users)); renderU(); if(users[i].u===me.u) upd();}
+function delUser(i){if(me.u!=='Adham012012012')return; if(users[i].r==='owner'){alert('لا يمكن حذف المالك');return;} users.splice(i,1); localStorage.setItem('x7_store',JSON.stringify(users)); renderU();}
+function gen(){return 'X7-'+Math.floor(1000+Math.random()*9000)+'-'+Math.random().toString(36).substr(2,4).toUpperCase()+'-X7-'+Math.random().toString(36).substr(2,2).toUpperCase();}
+function buy(){
+ alert('Purchases are not connected to shared stock or real balance yet. The owner can generate real app license keys from the App License Keys panel.');
+}
+async function makeRealKeys(){
+ if(!me || me.u!=='Adham012012012'){alert('Owner only');return;}
+ const pass=document.getElementById('adminPass').value;
+ const count=Math.max(1,Math.min(50,parseInt(document.getElementById('keyCount').value)||1));
+ const days=Math.max(1,parseInt(document.getElementById('keyDays').value)||30);
+ if(!pass){alert('Enter the server admin password');return;}
+ try{
+  const response=await fetch('/api/admin/keys/generate',{
+   method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Basic '+btoa('admin:'+pass)},
+   body:JSON.stringify({count,days,prefix:'X7',note:'Generated from X7 Team Store'})
+  });
+  const data=await response.json();
+  if(!response.ok || !data.ok){alert(data.error||'Could not generate keys. Check server password and server status.');return;}
+  document.getElementById('realKeys').innerHTML=data.keys.map(k=>`<div class="codeSingle"><span style="font-family:monospace">${k.key}</span><button onclick="navigator.clipboard.writeText('${k.key}')" style="background:#fff;color:#000;border:none;padding:4px 10px;border-radius:6px;font-weight:800">Copy</button></div>`).join('');
+ }catch(e){alert('Cannot reach the X7 Team server. Run the Node.js server first.');}
+}
+</script>
+</body>
+</html>
