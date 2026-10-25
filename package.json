@@ -1,17 +1,11 @@
 {
-  "name": "x7-team-license-server",
-  "version": "1.7.0",
-  "description": "X7 Team license portal and admin API",
+  "name": "x7-team",
+  "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
-  "keywords": [
-    "phantom",
-    "nulldash",
-    "client"
-  ],
-  "author": "NullDash",
-  "license": "ISC"
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
